@@ -84,7 +84,31 @@ function BoilingVerdict(props) {
   return <p>The water would not boil.</p>;
 }
 
-class Calculator extends React.Component {
+const scaleNames = {
+  c: 'Celsius',
+  f: 'Fahrenheit',
+}
+
+function toCelsius(temp) {
+  return (temp - 32) * 5 / 9;
+}
+
+function toFahrenheit(temp) {
+  return (temp * 9 / 5) + 32;
+}
+
+function tryConvert(temp, conv) {
+  const input = parseFloat(temp);
+  if (Number.isNaN(input)) {
+    return '';
+  }
+
+  const output = conv(input);
+  const rounded = Math.round(output * 1000) / 1000;
+  return rounded.toString();
+}
+
+class TempInput extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -97,15 +121,27 @@ class Calculator extends React.Component {
 
   render() {
     const temp = this.state.temp;
+    const scale = this.props.scale;
     return (
       <fieldset>
-        <legend>Enter temp in celsius:</legend>
+        <legend>Enter temp in {scaleNames[scale]}:</legend>
         <input
           value={temp}
           onChange={this.handleChange} />
         <BoilingVerdict
           celsius={parseFloat(temp)} />
       </fieldset>
+    );
+  }
+}
+
+class Calculator extends React.Component {
+  render() {
+    return (
+      <div>
+        <TempInput scale="c" />
+        <TempInput scale="f" />
+      </div>
     );
   }
 }
@@ -117,6 +153,7 @@ class App extends React.Component {
         <Clock />
         <Comment author="Adam" content="hello" />
         <NameForm />
+        <Calculator />
       </div>
     );
   }
