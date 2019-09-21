@@ -46,35 +46,26 @@ class Clock extends React.Component {
   }
 }
 
-class NameForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {value: ''};
+function handleSubmit(event, value) {
+  alert('A name was submitted: ' + value);
+  event.preventDefault();
+}
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+function NameForm() {
+  const [value, setValue] = useState('');
 
-  handleChange(event) {
-    this.setState({value: event.target.value});
-  }
-
-  handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
-    event.preventDefault();
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          Name:
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
-    );
-  }
+  return (
+    <form onSubmit={e => handleSubmit(e, value)}>
+      <label>
+        Name:
+        <input
+          type="text"
+          value={value}
+          onChange={e => setValue(e.target.value)} />
+      </label>
+      <input type="submit" value="Submit" />
+    </form>
+  );
 }
 
 function BoilingVerdict(props) {
