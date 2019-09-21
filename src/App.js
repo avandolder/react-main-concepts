@@ -108,67 +108,37 @@ function tryConvert(temp, conv) {
   return rounded.toString();
 }
 
-class TempInput extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(e) {
-    this.props.onTempChange(e.target.value);
-  }
-
-  render() {
-    const temp = this.props.temp;
-    const scale = this.props.scale;
-    return (
-      <fieldset>
-        <legend>Enter temp in {scaleNames[scale]}:</legend>
-        <input
-          value={temp}
-          onChange={this.handleChange} />
-      </fieldset>
-    );
-  }
+function TempInput({scale, temp, onTempChange}) {
+  return (
+    <fieldset>
+      <legend>Enter temp in {scaleNames[scale]}:</legend>
+      <input
+        value={temp}
+        onChange={e => onTempChange(e.target.value)} />
+    </fieldset>
+  );
 }
 
-class Calculator extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
-    this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
-    this.state = {temp: '', scale: 'c'};
-  }
+function Calculator() {
+  const [scale, setScale] = useState('c');
+  const [temp, setTemp] = useState('');
+  const celsius = scale === 'f' ? tryConvert(temp, toCelsius) : temp;
+  const fahrenheit = scale === 'c' ? tryConvert(temp, toFahrenheit) : temp;
 
-  handleCelsiusChange(temp) {
-    this.setState({scale: 'c', temp});
-  }
-
-  handleFahrenheitChange(temp) {
-    this.setState({scale: 'f', temp});
-  }
-
-  render() {
-    const scale = this.state.scale;
-    const temp = this.state.temp;
-    const celsius = scale === 'f' ? tryConvert(temp, toCelsius) : temp;
-    const fahrenheit = scale === 'c' ? tryConvert(temp, toFahrenheit) : temp;
-
-    return (
-      <div>
-        <TempInput
-          scale="c"
-          temp={celsius}
-          onTempChange={this.handleCelsiusChange} />
-        <TempInput
-          scale="f"
-          temp={fahrenheit}
-          onTempChange={this.handleFahrenheitChange} />
-        <BoilingVerdict
-          celsius={parseFloat(celsius)} />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <TempInput
+        scale="c"
+        temp={celsius}
+        onTempChange={(temp) => {setScale('c'); setTemp(temp);}} />
+      <TempInput
+        scale="f"
+        temp={fahrenheit}
+        onTempChange={(temp) => {setScale('f'); setTemp(temp);}} />
+      <BoilingVerdict
+        celsius={parseFloat(celsius)} />
+    </div>
+  );
 }
 
 function FilterableProductList({products}) {
