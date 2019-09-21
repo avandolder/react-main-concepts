@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -171,135 +171,110 @@ class Calculator extends React.Component {
   }
 }
 
-class FilterableProductList extends React.Component {
-  constructor(props) {
-    super(props);
+function FilterableProductList({products}) {
+  const [filterText, setFilterText] = useState('');
+  const [isStockOnly, setIsStockOnly] = useState(false);
 
-    this.state = {filterText: '', isStockOnly: false};
-    this.onFilterTextChange = this.onFilterTextChange.bind(this);
-    this.onIsStockOnlyChange = this.onIsStockOnlyChange.bind(this);
-  }
-
-  onFilterTextChange(e) {
-    this.setState({filterText: e.target.value});
-  }
-
-  onIsStockOnlyChange(e) {
-    this.setState({isStockOnly: e.target.checked});
-  }
-
-  render() {
-    return (
-      <div className="filterable-product-list">
-        <SearchBar
-          filterText={this.state.filterText}
-          isStockOnly={this.state.isStockOnly}
-          onFilterTextChange={this.onFilterTextChange}
-          onIsStockOnlyChange={this.onIsStockOnlyChange} />
-        <ProductTable
-          products={this.props.products}
-          filterText={this.state.filterText}
-          isStockOnly={this.state.isStockOnly} />
-      </div>
-    );
-  }
+  return (
+    <div className="filterable-product-list">
+      <SearchBar
+        filterText={filterText}
+        isStockOnly={isStockOnly}
+        setFilterText={setFilterText}
+        setIsStockOnly={setIsStockOnly} />
+      <ProductTable
+        products={products}
+        filterText={filterText}
+        isStockOnly={isStockOnly} />
+    </div>
+  );
 }
 
-class SearchBar extends React.Component {
-  render() {
-    return (
-      <form>
+function SearchBar({filterText, isStockOnly, setFilterText, setIsStockOnly}) {
+  return (
+    <form>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={filterText}
+        onChange={e => setFilterText(e.target.value)} />
+      <br />
+      <label>
         <input
-          type="text"
-          placeholder="Search..."
-          value={this.props.filterText}
-          onChange={this.props.onFilterTextChange} />
-        <br />
-        <label>
-          <input
-            type="checkbox"
-            checked={this.props.isStockOnly}
-            onChange={this.props.onIsStockOnlyChange} />
-          Only show products in stock
-        </label>
-      </form>
-    );
-  }
+          type="checkbox"
+          checked={isStockOnly}
+          onChange={e => setIsStockOnly(e.target.checked)} />
+        Only show products in stock
+      </label>
+    </form>
+  );
 }
 
-class ProductTable extends React.Component {
-  render() {
-    const regex = new RegExp(this.props.filterText, 'i');
-    const filteredProducts = this.props.products.filter(({name, stocked}) =>
-      regex.test(name) && (this.props.isStockOnly ? stocked : true)
-    );
-    const productsByCategory = filteredProducts.reduce((acc, p) => {
-      if (acc.has(p.category)) {
-        acc.get(p.category).push(p);
-      } else {
-        acc.set(p.category, [p]);
-      }
-      return acc;
-    }, new Map());
-        
-    return (
-      <div>
-        <div className="product-name"><b>Name</b></div>
-        <div className="product-price"><b>Price</b></div>
-        <ul className="product-table-list">
-          {[...productsByCategory.entries()].reduce((acc, [cat, ps]) => {
-            acc.push(<ProductCategoryRow category={cat} key={cat} />);
-            return acc.concat(ps.map((p) => <ProductRow product={p} key={p.name} />));
-          }, [])}
-        </ul>
+function ProductTable(props) {
+  const regex = new RegExp(props.filterText, 'i');
+  const filteredProducts = props.products.filter(({name, stocked}) =>
+    regex.test(name) && (props.isStockOnly ? stocked : true)
+  );
+  const productsByCategory = filteredProducts.reduce((acc, p) => {
+    if (acc.has(p.category)) {
+      acc.get(p.category).push(p);
+    } else {
+      acc.set(p.category, [p]);
+    }
+    return acc;
+  }, new Map());
+      
+  return (
+    <div>
+      <div className="product-name"><b>Name</b></div>
+      <div className="product-price"><b>Price</b></div>
+      <ul className="product-table-list">
+        {[...productsByCategory.entries()].reduce((acc, [cat, ps]) => {
+          acc.push(<ProductCategoryRow category={cat} key={cat} />);
+          return acc.concat(ps.map((p) => <ProductRow product={p} key={p.name} />));
+        }, [])}
+      </ul>
+    </div>
+  );
+}
+
+function ProductCategoryRow({category}) { 
+  return (
+    <li className="product-category">{category}</li>
+  );
+}
+
+function ProductRow({product}) {
+  const outOfStock = !product.stocked;
+
+  return (
+    <li>
+      <div className={'product-name ' + (outOfStock ? 'product-out-of-stock' : '')}>
+        {product.name}
       </div>
-    );
-  }
-}
-
-class ProductCategoryRow extends React.Component {
-  render() {
-    return (
-      <li className="product-category">{this.props.category}</li>
-    );
-  }
-}
-
-class ProductRow extends React.Component {
-  render() {
-    const outOfStock = !this.props.product.stocked;
-
-    return (
-      <li>
-        <div className={'product-name ' + (outOfStock ? 'product-out-of-stock' : '')}>
-          {this.props.product.name}
-        </div>
-        <div className="product-price">
-          {this.props.product.price}
-        </div>
-      </li>
-    );
-  }
-}
-
-class App extends React.Component {
-  render() {
-    const products = [
-      {category: "X", price: "$1.99", stocked: false, name: "a"},
-      {category: "X", price: "$1.99", stocked: true, name: "b"},
-      {category: "Y", price: "$1.99", stocked: true, name: "c"},
-    ];
-    
-    return (
-      <div>
-        <Clock />
-        <Comment author="Adam" content="hello" />
-        <NameForm />
-        <Calculator />
-        <FilterableProductList products={products} />
+      <div className="product-price">
+        {product.price}
       </div>
-    );
-  }
+    </li>
+  );
+}
+
+function App() {
+  const products = [
+    {category: "X", price: "$1.99", stocked: false, name: "a"},
+    {category: "X", price: "$1.99", stocked: true, name: "b"},
+    {category: "Y", price: "$1.99", stocked: true, name: "c"},
+  ];
+  
+  return (
+    <div>
+      <Clock />
+      <Comment author="Adam" content="hello" />
+      <NameForm />
+      <Calculator />
+      <FilterableProductList products={products} />
+    </div>
+  );
 }
 
 export default App;
