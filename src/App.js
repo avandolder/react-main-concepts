@@ -4,10 +4,10 @@ import './App.css';
 
 function Comment({author, content}) {
   return (
-    <div>
+    <>
       <div>{author}</div>
       <div>{content}</div>
-    </div>
+    </>
   );
 }
 
@@ -22,10 +22,10 @@ function Clock() {
   });
 
   return (
-    <div>
+    <>
       <h1>Hello, world!</h1>
       <h2>It is {date.toLocaleTimeString()}.</h2>
-    </div>
+    </>
   );
 }
 
@@ -100,7 +100,7 @@ function Calculator() {
   const fahrenheit = scale === 'c' ? tryConvert(temp, toFahrenheit) : temp;
 
   return (
-    <div>
+    <>
       <TempInput
         scale="c"
         temp={celsius}
@@ -111,7 +111,7 @@ function Calculator() {
         onTempChange={(temp) => {setScale('f'); setTemp(temp);}} />
       <BoilingVerdict
         celsius={parseFloat(celsius)} />
-    </div>
+    </>
   );
 }
 
@@ -169,7 +169,7 @@ function ProductTable(props) {
   }, new Map());
       
   return (
-    <div>
+    <>
       <div className="product-name"><b>Name</b></div>
       <div className="product-price"><b>Price</b></div>
       <ul className="product-table-list">
@@ -178,7 +178,7 @@ function ProductTable(props) {
           return acc.concat(ps.map((p) => <ProductRow product={p} key={p.name} />));
         }, [])}
       </ul>
-    </div>
+    </>
   );
 }
 
@@ -211,13 +211,13 @@ function App() {
   ];
   
   return (
-    <div>
+    <>
       <Clock />
       <Comment author="Adam" content="hello" />
       <NameForm />
       <Calculator />
       <FilterableProductList products={products} />
-    </div>
+    </>
   );
 }
 
