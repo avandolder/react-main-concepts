@@ -176,6 +176,16 @@ class FilterableProductList extends React.Component {
     super(props);
 
     this.state = {filterText: '', isStockOnly: false};
+    this.onFilterTextChange = this.onFilterTextChange.bind(this);
+    this.onIsStockOnlyChange = this.onIsStockOnlyChange.bind(this);
+  }
+
+  onFilterTextChange(e) {
+    this.setState({filterText: e.target.value});
+  }
+
+  onIsStockOnlyChange(e) {
+    this.setState({isStockOnly: e.target.checked});
   }
 
   render() {
@@ -183,7 +193,9 @@ class FilterableProductList extends React.Component {
       <div className="filterable-product-list">
         <SearchBar
           filterText={this.state.filterText}
-          isStockOnly={this.state.isStockOnly} />
+          isStockOnly={this.state.isStockOnly}
+          onFilterTextChange={this.onFilterTextChange}
+          onIsStockOnlyChange={this.onIsStockOnlyChange} />
         <ProductTable
           products={this.props.products}
           filterText={this.state.filterText}
@@ -197,10 +209,17 @@ class SearchBar extends React.Component {
   render() {
     return (
       <form>
-        <input type="text" value={this.props.filterText || 'Search...'} />
+        <input
+          type="text"
+          placeholder="Search..."
+          value={this.props.filterText}
+          onChange={this.props.onFilterTextChange} />
         <br />
         <label>
-          <input type="checkbox" value={this.props.isStockOnly} />
+          <input
+            type="checkbox"
+            checked={this.props.isStockOnly}
+            onChange={this.props.onIsStockOnlyChange} />
           Only show products in stock
         </label>
       </form>
@@ -211,7 +230,9 @@ class SearchBar extends React.Component {
 class ProductTable extends React.Component {
   render() {
     const regex = new RegExp(this.props.filterText, 'i');
-    const filteredProducts = this.props.products.filter(({name}) => regex.test(name));
+    const filteredProducts = this.props.products.filter(({name, stocked}) =>
+      regex.test(name) && (this.props.isStockOnly ? stocked : true)
+    );
     const productsByCategory = filteredProducts.reduce((acc, p) => {
       if (acc.has(p.category)) {
         acc.get(p.category).push(p);
