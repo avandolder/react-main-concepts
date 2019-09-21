@@ -172,11 +172,22 @@ class Calculator extends React.Component {
 }
 
 class FilterableProductList extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {filterText: '', isStockOnly: false};
+  }
+
   render() {
     return (
       <div className="filterable-product-list">
-        <SearchBar />
-        <ProductTable products={this.props.products} />
+        <SearchBar
+          filterText={this.state.filterText}
+          isStockOnly={this.state.isStockOnly} />
+        <ProductTable
+          products={this.props.products}
+          filterText={this.state.filterText}
+          isStockOnly={this.state.isStockOnly} />
       </div>
     );
   }
@@ -186,10 +197,10 @@ class SearchBar extends React.Component {
   render() {
     return (
       <form>
-        <input type="text" name="search" value="Search..." />
+        <input type="text" value={this.props.filterText || 'Search...'} />
         <br />
         <label>
-          <input type="checkbox" name="filter" />
+          <input type="checkbox" value={this.props.isStockOnly} />
           Only show products in stock
         </label>
       </form>
@@ -199,7 +210,9 @@ class SearchBar extends React.Component {
 
 class ProductTable extends React.Component {
   render() {
-    const productsByCategory = this.props.products.reduce((acc, p) => {
+    const regex = new RegExp(this.props.filterText, 'i');
+    const filteredProducts = this.props.products.filter(({name}) => regex.test(name));
+    const productsByCategory = filteredProducts.reduce((acc, p) => {
       if (acc.has(p.category)) {
         acc.get(p.category).push(p);
       } else {
