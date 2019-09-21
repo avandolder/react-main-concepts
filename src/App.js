@@ -171,14 +171,98 @@ class Calculator extends React.Component {
   }
 }
 
+class FilterableProductList extends React.Component {
+  render() {
+    return (
+      <div className="filterable-product-list">
+        <SearchBar />
+        <ProductTable products={this.props.products} />
+      </div>
+    );
+  }
+}
+
+class SearchBar extends React.Component {
+  render() {
+    return (
+      <form>
+        <input type="text" name="search" value="Search..." />
+        <br />
+        <label>
+          <input type="checkbox" name="filter" />
+          Only show products in stock
+        </label>
+      </form>
+    );
+  }
+}
+
+class ProductTable extends React.Component {
+  render() {
+    const productsByCategory = this.props.products.reduce((acc, p) => {
+      if (acc.has(p.category)) {
+        acc.get(p.category).push(p);
+      } else {
+        acc.set(p.category, [p]);
+      }
+      return acc;
+    }, new Map());
+        
+    return (
+      <div>
+        <div className="product-name"><b>Name</b></div>
+        <div className="product-price"><b>Price</b></div>
+        <ul className="product-table-list">
+          {[...productsByCategory.entries()].reduce((acc, [cat, ps]) => {
+            acc.push(<ProductCategoryRow category={cat} key={cat} />);
+            return acc.concat(ps.map((p) => <ProductRow product={p} key={p.name} />));
+          }, [])}
+        </ul>
+      </div>
+    );
+  }
+}
+
+class ProductCategoryRow extends React.Component {
+  render() {
+    return (
+      <li className="product-category">{this.props.category}</li>
+    );
+  }
+}
+
+class ProductRow extends React.Component {
+  render() {
+    const outOfStock = !this.props.product.stocked;
+
+    return (
+      <li>
+        <div className={'product-name ' + (outOfStock ? 'product-out-of-stock' : '')}>
+          {this.props.product.name}
+        </div>
+        <div className="product-price">
+          {this.props.product.price}
+        </div>
+      </li>
+    );
+  }
+}
+
 class App extends React.Component {
   render() {
+    const products = [
+      {category: "X", price: "$1.99", stocked: false, name: "a"},
+      {category: "X", price: "$1.99", stocked: true, name: "b"},
+      {category: "Y", price: "$1.99", stocked: true, name: "c"},
+    ];
+    
     return (
       <div>
         <Clock />
         <Comment author="Adam" content="hello" />
         <NameForm />
         <Calculator />
+        <FilterableProductList products={products} />
       </div>
     );
   }

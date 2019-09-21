@@ -11,3 +11,31 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.filterable-product-list {
+  width: 30ch;
+}
+
+.product-table-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.product-category {
+  font-weight: bold;
+}
+
+.product-name {
+  width: 50%;
+  float: left;
+}
+
+.product-price {
+  width: 50%;
+  float: right;
+}
+
+.product-out-of-stock {
+  color: red;
+}
